@@ -6,6 +6,10 @@ on:
       - ".cursor-plugin/marketplace.json"
       - "**/plugin.json"
       - "schemas/**"
+      - ".agents/plugins/marketplace.json"
+      - ".claude-plugin/marketplace.json"
+      - "pstack/**"
+      - "scripts/validate-pstack.mjs"
 
 jobs:
   validate:
@@ -22,3 +26,6 @@ jobs:
 
       - name: Validate plugin definitions
         run: node scripts/validate-plugins.mjs
+
+      - name: Validate pstack packaging and skill references
+        run: node scripts/validate-pstack.mjs

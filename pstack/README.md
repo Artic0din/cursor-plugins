@@ -14,9 +14,30 @@ fork it. improve it. make it yours. PRs are welcome!
 
 ## install
 
+Cursor: `/add-plugin pstack`.
+
+Claude Code:
+
 ```bash
-/add-plugin pstack
+claude plugin marketplace add Artic0din/cursor-plugins
+claude plugin install pstack@cursor-plugins
 ```
+
+Codex:
+
+```bash
+codex plugin marketplace add Artic0din/cursor-plugins
+codex plugin add pstack@cursor-plugins
+```
+
+For a local checkout, replace the marketplace repository with its absolute path.
+Claude Code can also load a checkout for one session with `claude --plugin-dir /absolute/path/to/cursor-plugins/pstack`.
+In T3 Code, install the plugin for each native provider you use, then start a fresh provider session.
+T3 supplies delegation tools; it does not install pstack for the providers.
+
+Invoke `/pstack:poteto-mode` and `/pstack:setup-pstack` in Claude Code, or `$poteto-mode` and `$setup-pstack` in Codex.
+The guide's unqualified slash commands are Cursor examples.
+See [runtime compatibility](skills/poteto-mode/references/runtime.md) for settings, delegation, paths, and host limits.
 
 ## get started
 
@@ -27,7 +48,13 @@ two steps:
 
 new here? the [pstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs. stuck, or unsure which skill fits? ask [`/poteto-help`](./skills/poteto-help/SKILL.md).
 
-that's it. the other skills are situational; the mode skill uses them for you as needed. out of the box the mode splits work by model strength: code delegates (feature, refactoring, bug fix, perf, hillclimb) go to grok, while the hardest changes, prose, and judgment go to opus 5.5. the default panel is opus 5.5 / grok. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) changes any of it.
+that's it. the other skills are situational; the mode skill uses them for you as needed. Codex and Claude Code inherit the parent model by default, including two independent seats for review panels. Run setup to choose supported models or a multi-provider panel in T3. On native Cursor, out of the box the mode splits work by model strength: code delegates (feature, refactoring, bug fix, perf, hillclimb) go to grok, while the hardest changes, prose, and judgment go to opus 5.5. the default panel is opus 5.5 / grok. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) changes any of it.
+
+Model settings live in `~/.config/pstack/models.json`, with separate entries per host.
+Existing Cursor rules remain readable until setup migrates that host.
+Cloud VMs, Custom Modes, Cursor Automations, and persistent wake mechanisms depend on host capabilities; installing the skills does not add those services.
+Native hosts can run independent same-provider agents; cross-provider execution uses T3 when available.
+Codex invocation policy preserves explicit-only skills through `agents/openai.yaml`; workflow composition reads sibling skills by path.
 
 ## usage
 
@@ -191,11 +218,11 @@ help:              /poteto-help which skill should i use to review this branch?
 
 ## the `poteto-agent` and Comment Sicko subagents
 
-pstack also ships a subagent that runs my style end to end. spawn it from a parent agent via [`subagent_type: "poteto-agent"`](./agents/poteto-agent.md). it reads `poteto-mode` in full, including its inline principles index, before doing any work. substituting `generalPurpose` skips that read and drifts.
+pstack also ships [poteto-agent](./agents/poteto-agent.md), which runs my style end to end. use the registered agent or require a worker to read its instruction source through the [runtime's delegation rules](./skills/poteto-mode/references/runtime.md). it reads `poteto-mode` in full, including its inline principles index, before doing any work.
 
-[`/poteto-mode`](./skills/poteto-mode/SKILL.md) and [`subagent_type: "poteto-agent"`](./agents/poteto-agent.md) route through the same wrapper.
+[`/poteto-mode`](./skills/poteto-mode/SKILL.md) and [poteto-agent](./agents/poteto-agent.md) use the same instruction source.
 
-pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only comment reviewer available as `subagent_type: "Comment Sicko"`. usually invoke it through [`/no-comments`](./skills/no-comments/SKILL.md), not directly.
+pstack also ships [Comment Sicko](./agents/comment-sicko.md), a read-only comment reviewer registered as `comment-sicko` on Cursor and `pstack:comment-sicko` on Claude Code. Codex/T3 workers use its instruction source through the runtime's delegation rules. usually invoke it through [`/no-comments`](./skills/no-comments/SKILL.md), not directly.
 
 ## principles
 

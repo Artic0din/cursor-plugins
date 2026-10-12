@@ -6,11 +6,14 @@ disable-model-invocation: true
 
 # Why
 
+Read [the runtime reference](../poteto-mode/references/runtime.md) before following this workflow's host-specific instructions.
+
 Investigate the motivation and intent behind code. The companion `how` skill answers what the code does and how it works. `why` answers what forces led to its shape.
 
-Each spawn below names a role line in the `pstack-models.mdc` rule and a default. Set `model` to that line's value, or to the default if the rule or the line is missing. Leave `model` unset when the value is `auto` or `inherit-parent`. If the Task tool rejects a slug, use the default and say so. If it rejects the default, use the closest valid slug of the same family from its error message.
+Resolve each named role through the runtime reference's role settings; the defaults listed below apply only on native Cursor.
 
-Every spawn is `generalPurpose` with `readonly: false` (agent mode). **Do not use readonly/Ask mode.** It strips MCP access, which disables the MCP-backed investigators and the synthesizer's citation spot-checks. Investigators still shouldn't write anything.
+Investigators and the synthesizer must retain the MCP tools their evidence needs.
+Use the runtime's general agent with a read-only task brief; on Cursor use agent mode rather than readonly/Ask mode because those modes strip MCP access.
 
 ## Operating Posture
 
@@ -32,7 +35,7 @@ Before spawning investigators, build the seed context inline: file paths and lin
 
 ### Discovery
 
-Before spawning investigators, list the available MCPs from the Cursor environment. Use the available-tools map when present. Otherwise inspect the `mcps/` directory Cursor exposes for enabled MCP servers.
+Before spawning investigators, discover enabled MCPs from the active host's tools. Use its available-tools map or deferred tool search; inspect Cursor's `mcps/` directory only on Cursor.
 
 Map each available MCP to one evidence category:
 

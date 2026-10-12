@@ -1,10 +1,16 @@
 {
   "name": "cursor-plugins",
+  "description": "Agent workflows and integrations, including portable pstack skills.",
   "owner": {
     "name": "Cursor",
     "email": "plugins@cursor.com"
   },
   "plugins": [
+    {
+      "name": "pstack",
+      "source": "./pstack",
+      "description": "Rigorous engineering workflows for Cursor, Codex, Claude Code, and T3 Code."
+    },
     {
       "name": "origin-apps",
       "source": "./origin-apps",

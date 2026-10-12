@@ -1,5 +1,8 @@
 # The pstack guide
 
+This guide uses Cursor command and UI examples.
+For Codex, Claude Code, or T3 Code, use the [installation instructions](../../README.md#install) and [runtime reference](../../skills/poteto-mode/references/runtime.md) for the corresponding commands, paths, and capabilities.
+
 pstack works best when you stop micromanaging the agent. You describe what you want and how you'll know it's done. `/poteto-mode` picks the playbook, runs the other skills as the steps need them, and shows you the evidence. This guide teaches that habit with realistic prompts.
 
 Here's what you'll learn:

@@ -6,12 +6,15 @@ disable-model-invocation: true
 
 # Reflect
 
+Read [the runtime reference](../poteto-mode/references/runtime.md) before following this workflow's host-specific instructions.
+
 Mine the current conversation for durable learnings, then route them into skill edits.
 
 Invoke when the user says "reflect" or "/reflect". Skip when the conversation is trivial, off-topic, or already covered by an existing skill the parent followed correctly. One-offs are not learnings.
 
 ## 1. Locate the active transcript
 
+Resolve in-scope history through the runtime reference; the directory examples below apply only to Cursor.
 Before fanning out, find this conversation's transcript in the `agent-transcripts/` directory the system prompt names. Do not glob across `~/.cursor/projects/*/`. That crosses workspace boundaries and reads private chats from unrelated projects.
 
 ```bash
@@ -22,9 +25,9 @@ That covers the legacy flat (`<id>.jsonl`), current nested (`<id>/<id>.jsonl`), 
 
 ## 2. Spawn three reviewers in parallel
 
-One message, three `Task` calls, `subagent_type: generalPurpose`, agent mode (`readonly: false`). Reviewers need MCP access to look up the tickets, chat threads, and observability traces the transcript references, and readonly strips MCPs.
+Spawn three reviewers through the runtime's delegation tool, with the MCP access their evidence needs and read-only investigative briefs.
 
-Each reviewer and the synthesizer name a role line in the `pstack-models.mdc` rule and a default. Set `model` to that line's value, or to the default if the rule or the line is missing. Leave `model` unset when the value is `auto` or `inherit-parent`. If the Task tool rejects a slug, use the default and say so. If it rejects the default, use the closest valid slug of the same family from its error message.
+Resolve each reviewer's and synthesizer's named role through the runtime reference's settings. The table's defaults apply only on native Cursor.
 
 | Lens | Role line | Default `model` | Prompt template |
 |---|---|---|---|
@@ -32,11 +35,11 @@ Each reviewer and the synthesizer name a role line in the `pstack-models.mdc` ru
 | Tooling | `reflect tooling` | `grok-4.7-xhigh-fast` | `references/tooling-reviewer.md` |
 | Divergent | `reflect judgment, divergent, synthesizer` | `claude-opus-5-5-xhigh` | `references/divergent-reviewer.md` |
 
-Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the `Task` response body.
+Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in the child task's response body.
 
 ## 3. Synthesize
 
-One `Task` call, `subagent_type: generalPurpose`, `model` from the `reflect judgment, divergent, synthesizer` line (default `claude-opus-5-5-xhigh`), agent mode (`readonly: false`). It spot-verifies citations through MCP, and readonly strips MCPs. Pass `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. It returns an Accepted / Rejected / Backlog list.
+Spawn one synthesizer with the `reflect judgment, divergent, synthesizer` role through the runtime reference. It needs MCP access for citation checks. Pass `references/synthesizer.md` verbatim with each reviewer's full output inlined where marked. It returns an Accepted / Rejected / Backlog list.
 
 ## 4. Structural enforcement check
 

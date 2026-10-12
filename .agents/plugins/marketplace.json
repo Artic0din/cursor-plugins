@@ -1,0 +1,12 @@
+{
+  "name": "cursor-plugins",
+  "interface": { "displayName": "Cursor Plugins" },
+  "plugins": [
+    {
+      "name": "pstack",
+      "source": { "source": "local", "path": "./pstack" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Developer Tools"
+    }
+  ]
+}

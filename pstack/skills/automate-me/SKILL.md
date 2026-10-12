@@ -6,6 +6,10 @@ disable-model-invocation: true
 
 # Automate me
 
+Resolve project/personal skill locations through the runtime reference; `.cursor/skills/` examples below apply only on Cursor.
+
+Read [the runtime reference](../poteto-mode/references/runtime.md) before following this workflow's host-specific instructions.
+
 A guided flow for turning the user's working conventions into a skill agents will follow. The output is one `-mode` skill tailored to them (e.g. `jay-mode`, `priya-mode`).
 
 This skill orchestrates three others: an inline mining pass (see step 1), Cursor's built-in `create-skill` (authoring), and the **unslop** skill (prose discipline). It sequences them. It doesn't replace them.
@@ -26,6 +30,7 @@ Update mode changes the rest of the flow:
 
 ### 1. Mine their history
 
+Resolve workspace-scoped history through the runtime reference; the path examples below apply only to Cursor.
 Locate the active workspace's transcripts before fanning out. The system prompt names the workspace's `agent-transcripts/` directory. Use only that path. Don't glob across `~/.cursor/projects/*/`. That crosses workspace boundaries and reads private chats from unrelated projects.
 
 Survey recent agent conversations within that scope for recurring patterns. Run multiple parallel subagents across slices of history (e.g. last 2-4 weeks, split into 3 slices so each has enough material). Each slice mining subagent reads transcripts from the workspace-scoped path the parent provides, looks for the signals below, and returns a short structured list of patterns it saw with evidence pointers. Default signals worth hunting:
@@ -41,9 +46,9 @@ Cross-check across slices before elevating a signal. Patterns seen in 2+ slices 
 
 ### 2. Ask the user directly
 
-Mining misses intent that hasn't come up yet. Use the `AskQuestion` tool (structured multi-choice) rather than asking the user to type from scratch.
+Mining misses intent that hasn't come up yet. Use the active host's supported question tool through the runtime reference, or one concise chat question when unavailable.
 
-Shape: one or two questions with 4-6 options each, `allow_multiple: true` for category questions. Start broad ("Which areas matter most?"), then follow up on selected areas with specific options. After the structured rounds, one free-form chat question catches anything the options missed.
+Shape: one or two questions with 4-6 options each. Enable multiple selection for category questions only when the host supports it; otherwise accept selections in text. Start broad ("Which areas matter most?"), then follow up on selected areas with specific options. After the structured rounds, one free-form chat question catches anything the options missed.
 
 Don't dump 20 questions.
 

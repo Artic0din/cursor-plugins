@@ -4,7 +4,7 @@
 # operated in it. Emits a table sorted by size with a suggested bucket. Never
 # deletes anything; deletion stays a human-gated step in the playbook.
 #
-# Usage: worktree-audit.sh [repo-path]   (defaults to the current repo)
+# Usage: worktree-audit.sh [repo-path]; PSTACK_TRANSCRIPTS_DIR overrides history.
 set -u
 
 repo="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
@@ -24,7 +24,7 @@ gh pr list --author "@me" --state all --limit 1000 \
 
 # Transcripts dir: ~/.cursor/projects/<slugified-repo-path>/agent-transcripts.
 slug=$(printf '%s' "$main_wt" | sed 's#^/##; s#/#-#g')
-transcripts="$HOME/.cursor/projects/$slug/agent-transcripts"
+transcripts="${PSTACK_TRANSCRIPTS_DIR-$HOME/.cursor/projects/$slug/agent-transcripts}"
 now=$(date +%s)
 
 printf "SIZE\tAGE\tMERGED\tDIRTY\tREMOTE\tPR\tLAST_CHAT\tBUCKET\tWORKTREE\n"
@@ -74,6 +74,7 @@ git worktree list --porcelain | awk '/^worktree /{print $2}' | while read -r wt;
 	case "$dirty" in wip:*) bucket=hold-wip ;; *)
 		case "$pr" in *OPEN*) bucket=hold-open-pr ;; *)
 			if [ "$recent" = yes ]; then bucket=verify-recent-chat
+			elif [ ! -d "$transcripts" ]; then bucket=review-history
 			elif [ "$merged" = YES ] || [ "$pr" != "-" ]; then bucket=safe
 			else bucket=review; fi ;;
 		esac ;;

@@ -1,5 +1,5 @@
 ---
-name: Poteto Mode
+name: poteto-mode
 description: poteto's agent style for concise, detailed responses, deliberate subagents, unslopped prose, simple code, and verified work. Use for poteto, /poteto-mode, or requests to work in this style.
 disable-model-invocation: true
 mode: true
@@ -9,6 +9,9 @@ reminder: New task? Playbook match or rigor needed -> apply /poteto-mode. Casual
 ---
 
 # Poteto mode
+
+Read [the runtime reference](references/runtime.md) before any workflow.
+It resolves host-specific settings, delegation, paths, and optional companion tools for Cursor, Codex, Claude Code, and T3 Code.
 
 ## Non-negotiables
 
@@ -90,9 +93,9 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 
 ## Subagents
 
-**Use `subagent_type: "poteto-agent"` for any subagent you spawn inside a playbook step** (code-writing delegates, ad-hoc helpers). `/poteto-mode` and `poteto-agent` route through the same wrapper. Routed workflow skills (`how`, `why`, `interrogate`, `reflect`, `swarm`) set their own `subagent_type` for diverse-model review. Respect what the skill prescribes, don't override to `poteto-agent`.
+**Use the poteto-agent instruction source for playbook delegates** (code-writing delegates and ad-hoc helpers), through the runtime's supported agent type or a general agent required to read `agents/poteto-agent.md`. Routed skills (`how`, `why`, `interrogate`, `reflect`, `swarm`) prescribe their own roles; retain those roles.
 
-**Defaults for every `Task` call.** `run_in_background: true`, agent mode (readonly strips MCP), file pointers not inlined context, explicit model per role (configurable via `/setup-pstack`. Defaults `grok-4.7-xhigh-fast` for code, `claude-opus-5-5-xhigh` for prose and judgment). Code delegates tier by difficulty. The hardest changes (cross-cutting design, gnarly concurrency, subtle algorithms) go to your strongest judgment model (`claude-opus-5-5-xhigh`), whether the task needs judgment on vague intent or is a precisely specified sequence of steps to execute to the letter. Trivial mechanical edits go to your fast code model. Per-role lines in the `/setup-pstack` rule override these defaults and the model choices in the routed skills (`how`, `why`, `arena`, `swarm`, `architect`, `interrogate`, `reflect`). A role with no line keeps its default, and a role line of `inherit-parent` or `auto` runs that role on the parent chat model (omit Task `model`). Each code playbook's configured model comes from its line (`feature, refactoring`, `bug-fix`, `perf-issue`, or `hillclimb`), and the hardest changes read `hardest tasks`. Prose and judgment read `judgment and prose`.
+**Defaults for every child task.** Use the runtime reference for settings, supported tool arguments, permissions, isolation, and effective models. Background execution is preferred when available. Pass file pointers rather than inlining large context. Code delegates use their playbook role (`feature, refactoring`, `bug-fix`, `perf-issue`, or `hillclimb`); the hardest cross-cutting, concurrency, or algorithmic work uses `hardest tasks`. Prose and judgment use `judgment and prose`. Explicit role settings override defaults. Native Cursor keeps Grok code / Opus judgment defaults; other hosts inherit until configured.
 
 You own every subagent's work. Review the diff and write your own summary, don't pass through what it said. A second opinion is the same prompt against a different model. Agreement is high-signal.
 
