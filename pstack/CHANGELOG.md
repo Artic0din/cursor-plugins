@@ -11,3 +11,7 @@ All notable changes to this plugin are documented here.
 ### Changed
 
 - Required history review before treating a worktree with unavailable session history as safe to remove.
+
+### Fixed
+
+- Kept unavailable, unmatched, or failed history scans out of the safe worktree bucket, isolated host settings writes, and corrected host-specific authoring, invocation, model, and verification instructions.

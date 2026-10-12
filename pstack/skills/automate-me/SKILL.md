@@ -1,24 +1,24 @@
 ---
 name: automate-me
-description: "Use for \"automate me\", \"create/update/refresh my -mode skill\", \"turn/capture my preferences or working style into a skill\", or wanting agents to follow how the user works. Drafts or revises a personal -mode skill via create-skill + unslop, optionally pulling fresh evidence from recent transcripts."
+description: "Use for \"automate me\", \"create/update/refresh my -mode skill\", \"turn/capture my preferences or working style into a skill\", or wanting agents to follow how the user works. Drafts or revises a personal -mode skill via the host's authoring workflow + unslop, optionally pulling fresh evidence from recent transcripts."
 disable-model-invocation: true
 ---
 
 # Automate me
 
-Resolve project/personal skill locations through the runtime reference; `.cursor/skills/` examples below apply only on Cursor.
+Resolve `<project-skills>` and `<personal-skills>` to the active host's directories from the runtime reference before using any path below.
 
 Read [the runtime reference](../poteto-mode/references/runtime.md) before following this workflow's host-specific instructions.
 
 A guided flow for turning the user's working conventions into a skill agents will follow. The output is one `-mode` skill tailored to them (e.g. `jay-mode`, `priya-mode`).
 
-This skill orchestrates three others: an inline mining pass (see step 1), Cursor's built-in `create-skill` (authoring), and the **unslop** skill (prose discipline). It sequences them. It doesn't replace them.
+This skill orchestrates three others: an inline mining pass (see step 1), the runtime reference's host authoring workflow, and the **unslop** skill (prose discipline). It sequences them. It doesn't replace them.
 
 ## Flow
 
 ### 0. Check for an existing skill
 
-Look recursively for `.cursor/skills/**/*-mode/SKILL.md` and `~/.cursor/skills/*-mode/SKILL.md` matching the user's handle. Mode skills can live in a personal category directory (`.cursor/skills/<handle>/`), not only at the top level. If one exists, confirm intent with `AskQuestion` (unless they already said "update my skill" or similar):
+Look recursively for `<project-skills>/**/*-mode/SKILL.md` and `<personal-skills>/*-mode/SKILL.md` matching the user's handle. Mode skills can live in a personal category directory (`<project-skills>/<handle>/`), not only at the top level. If one exists, confirm intent through the host's question tool (unless they already said "update my skill" or similar):
 
 - Update the existing skill (default for repeat runs)
 - Start fresh (rare, ask why before doing it)
@@ -69,17 +69,17 @@ The **poteto-mode** skill shows the shape. Read it for granularity. Don't copy i
 
 ### 4. Draft the skill
 
-Use Cursor's built-in `create-skill` skill to author the skill. Placement:
+Use the runtime reference's host authoring workflow to author the skill. Placement:
 
-- Path: preserve an existing mode skill's category. For a new mode, use `.cursor/skills/<handle>/<handle>-mode/SKILL.md` when the repo has an established personal category for that handle. Otherwise default to `.cursor/skills/<handle>-mode/SKILL.md` in the project (or `~/.cursor/skills/<handle>-mode/` if the user prefers a personal skill).
+- Path: preserve an existing mode skill's category. For a new mode, use `<project-skills>/<handle>/<handle>-mode/SKILL.md` when the repo has an established personal category for that handle. Otherwise default to `<project-skills>/<handle>-mode/SKILL.md` in the project (or `<personal-skills>/<handle>-mode/` if the user prefers a personal skill).
 - Handle: the user's first name or chosen identifier.
 - Frontmatter `description`: trigger on their name + `/<handle>-mode` + "work in their style", not on generic keywords like "write code" or "review PR".
-- Frontmatter formatting: follow `create-skill`'s YAML rules. Keep `description` as one YAML scalar. Quote it or use `description: >-` with indented continuation lines when punctuation or wrapping requires it.
+- Frontmatter formatting: follow Agent Skills frontmatter rules. Keep `description` as one YAML scalar. Quote it or use `description: >-` with indented continuation lines when punctuation or wrapping requires it.
 - Frontmatter `disable-model-invocation: true` by default. Opt out only if the user explicitly wants their mode to apply on every turn.
 
 ### 5. Iterate on prose
 
-Apply the **unslop** skill and `create-skill`'s writing guidelines to every line.
+Apply the **unslop** skill and the available authoring workflow's writing guidelines to every line.
 
 Show the draft to the user and take feedback. Expect multiple iterations. Cut ruthlessly. A mode skill is not a manual.
 
@@ -104,6 +104,6 @@ Run a description-optimization loop only if the skill's trigger accuracy turns o
 
 ## When not to use
 
-- User wants a task-specific skill (not working conventions): `create-skill` alone, no mining required.
+- User wants a task-specific skill (not working conventions): the runtime reference's authoring workflow alone, no mining required.
 - User wants to capture one narrow workflow (e.g. "how I write commit messages"). That's a regular skill, not a mode skill.
 

@@ -50,7 +50,8 @@ new here? the [pstack guide](./docs/guide/README.md) walks you through a first r
 
 that's it. the other skills are situational; the mode skill uses them for you as needed. Codex and Claude Code inherit the parent model by default, including two independent seats for review panels. Run setup to choose supported models or a multi-provider panel in T3. On native Cursor, out of the box the mode splits work by model strength: code delegates (feature, refactoring, bug fix, perf, hillclimb) go to grok, while the hardest changes, prose, and judgment go to opus 5.5. the default panel is opus 5.5 / grok. [`/setup-pstack`](./skills/setup-pstack/SKILL.md) changes any of it.
 
-Model settings live in `~/.config/pstack/models.json`, with separate entries per host.
+Model settings live in `~/.config/pstack/models-<host>.json`, with a separate file per host so concurrent setup cannot overwrite another host's choices.
+Legacy shared `models.json` remains readable and is never rewritten during migration.
 Existing Cursor rules remain readable until setup migrates that host.
 Cloud VMs, Custom Modes, Cursor Automations, and persistent wake mechanisms depend on host capabilities; installing the skills does not add those services.
 Native hosts can run independent same-provider agents; cross-provider execution uses T3 when available.

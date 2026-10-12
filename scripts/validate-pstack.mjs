@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -86,14 +86,61 @@ esac
     writeFileSync(path, body);
     chmodSync(path, 0o755);
   }
-  for (const [transcripts, expected] of [["", "review-history"], [history, "safe"]]) {
+  const transcript = resolve(history, "activity with spaces.jsonl");
+  const realStat = execFileSync("sh", ["-c", "command -v stat"], { encoding: "utf8" }).trim();
+  writeFileSync(resolve(bin, "rg"), `#!/bin/sh
+if [ "\${PSTACK_TEST_SCAN_FAIL:-}" = yes ]; then
+  printf '%s\\n' "$PSTACK_TEST_TRANSCRIPT"
+  echo 'transcript scan failed' >&2
+  exit 2
+fi
+set -- "$PSTACK_TEST_HISTORY"/*.jsonl
+[ -f "$1" ] || exit 1
+grep -lF -e "$PSTACK_TEST_WORKER/" -e "$PSTACK_TEST_WORKER\\\"" "$@"
+`);
+  writeFileSync(resolve(bin, "stat"), `#!/bin/sh
+case "\${PSTACK_TEST_STAT:-}" in
+  failed) exit 1 ;;
+  malformed) echo invalid; exit 0 ;;
+  partial) case "$*" in *broken.jsonl*) exit 1 ;; esac ;;
+esac
+exec "$PSTACK_TEST_REAL_STAT" "$@"
+`);
+  chmodSync(resolve(bin, "rg"), 0o755);
+  chmodSync(resolve(bin, "stat"), 0o755);
+  const cases = [
+    ["missing", "review-history"], ["empty", "review-history"],
+    ["unmatched", "review-history"], ["unreadable", "review-history"],
+    ["scan-failed", "review-history"], ["stat-failed", "review-history"],
+    ["stat-malformed", "review-history"], ["partial-stat", "review-history"],
+    ["old", "safe"], ["recent", "verify-recent-chat"],
+  ];
+  for (const [scenario, expected] of cases) {
+    rmSync(transcript, { force: true });
+    rmSync(resolve(history, "broken.jsonl"), { force: true });
+    if (!["missing", "empty"].includes(scenario)) {
+      writeFileSync(transcript, JSON.stringify({ path: scenario === "unmatched" ? main : `${worker}/README.md` }));
+      const modified = new Date(Date.now() - (["recent", "partial-stat"].includes(scenario) ? 0 : 10 * 86400000));
+      utimesSync(transcript, modified, modified);
+      if (scenario === "partial-stat") writeFileSync(resolve(history, "broken.jsonl"), JSON.stringify({ path: `${worker}/README.md` }));
+    }
+    if (scenario === "unreadable") chmodSync(history, 0);
     const output = execFileSync("bash", [resolve(pluginRoot, "skills/poteto-mode/scripts/worktree-audit.sh"), main], {
       encoding: "utf8",
-      env: { ...process.env, PATH: `${bin}:${process.env.PATH}`, PSTACK_TRANSCRIPTS_DIR: transcripts },
+      stdio: ["ignore", "pipe", "pipe"],
+      env: {
+        ...process.env, PATH: `${bin}:${process.env.PATH}`,
+        PSTACK_TRANSCRIPTS_DIR: scenario === "missing" ? "" : history,
+        PSTACK_TEST_SCAN_FAIL: ["scan-failed", "unreadable"].includes(scenario) ? "yes" : "no",
+        PSTACK_TEST_STAT: scenario === "partial-stat" ? "partial" : scenario === "stat-failed" ? "failed" : scenario === "stat-malformed" ? "malformed" : "",
+        PSTACK_TEST_TRANSCRIPT: transcript, PSTACK_TEST_WORKER: worker,
+        PSTACK_TEST_HISTORY: history, PSTACK_TEST_REAL_STAT: realStat,
+      },
     });
+    chmodSync(history, 0o755);
     const row = output.trim().split("\n").find((line) => line.endsWith(`\t${worker}`));
     assert(row, "worktree audit did not return the fixture worker");
-    assert.equal(row.split("\t")[7], expected, "worktree audit misclassified session history");
+    assert.equal(row.split("\t")[7], expected, `worktree audit misclassified ${scenario} history`);
   }
 } finally {
   rmSync(fixture, { recursive: true, force: true });

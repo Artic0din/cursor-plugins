@@ -62,19 +62,31 @@ git worktree list --porcelain | awk '/^worktree /{print $2}' | while read -r wt;
 
 	# Most recent chat whose transcript operated in this worktree. Match path
 	# followed by "/" or a quote so glint-482 does not match glint-482-r37.
-	last="-"; last_ts=0
-	if [ -d "$transcripts" ]; then
-		f=$(rg -l -e "${wt}/" -e "${wt}\"" "$transcripts" 2>/dev/null \
-			| xargs stat -f '%m %N' 2>/dev/null | sort -rn | head -1)
-		if [ -n "$f" ]; then last_ts=$(echo "$f" | awk '{print $1}')
-			last=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null); fi
+	last="-"; last_ts=0; history_checked=no
+	if [ -d "$transcripts" ] && [ -r "$transcripts" ] && [ -x "$transcripts" ] \
+		&& matches=$(rg -l -F --glob '*.jsonl' -e "${wt}/" -e "${wt}\"" "$transcripts"); then
+		if [ -n "$matches" ]; then
+			history_checked=yes
+			while IFS= read -r transcript; do
+				timestamp=$(stat -f '%m' "$transcript" 2>/dev/null) \
+					|| timestamp=$(stat -c '%Y' "$transcript" 2>/dev/null) \
+					|| { history_checked=no; break; }
+				case "$timestamp" in ''|*[!0-9]*) history_checked=no; break ;; esac
+				[ "$timestamp" -gt "$last_ts" ] && last_ts="$timestamp"
+			done <<< "$matches"
+			if [ "$history_checked" = yes ]; then
+				last=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null \
+					|| date -d "@$last_ts" '+%Y-%m-%d' 2>/dev/null) \
+					|| history_checked=no
+			fi
+		fi
 	fi
-	recent=$([ "$last_ts" -gt 0 ] 2>/dev/null && [ $(( (now - last_ts) / 86400 )) -le 4 ] && echo yes || echo no)
+	recent=$([ "$history_checked" = yes ] && [ "$last_ts" -gt 0 ] 2>/dev/null && [ $(( (now - last_ts) / 86400 )) -le 4 ] && echo yes || echo no)
 
 	case "$dirty" in wip:*) bucket=hold-wip ;; *)
 		case "$pr" in *OPEN*) bucket=hold-open-pr ;; *)
 			if [ "$recent" = yes ]; then bucket=verify-recent-chat
-			elif [ ! -d "$transcripts" ]; then bucket=review-history
+			elif [ "$history_checked" != yes ]; then bucket=review-history
 			elif [ "$merged" = YES ] || [ "$pr" != "-" ]; then bucket=safe
 			else bucket=review; fi ;;
 		esac ;;

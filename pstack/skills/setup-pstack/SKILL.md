@@ -6,7 +6,8 @@ description: Configure pstack role models and reasoning budgets for Cursor, Code
 # Setup pstack
 
 Read [the runtime reference](../poteto-mode/references/runtime.md) first.
-Write portable role settings to `~/.config/pstack/models.json`.
+Write the selected host's settings to `~/.config/pstack/models-<host>.json`.
+Each host owns its file so concurrent setup on different hosts cannot overwrite settings.
 Never edit global AGENTS.md, CLAUDE.md, or provider configuration to configure pstack.
 
 ## 1. Detect available choices
@@ -20,9 +21,10 @@ If no catalog is exposed, inheritance is the safe choice; do not invent IDs or a
 
 ## 2. Load current settings
 
-Read the portable file if present and validate version 1, host keys, role names, choice shapes, and panel sizes before editing.
+Read the selected host's file if present; otherwise import that host's entry from legacy `~/.config/pstack/models.json` without changing the legacy file.
+Validate version 1, host keys, role names, choice shapes, and panel sizes before editing.
 Stop with a specific error on invalid JSON or invalid fields; retain the original.
-Preserve other hosts' entries and every valid role already configured.
+Preserve every valid role already configured; leave other hosts' files untouched.
 On native Cursor with no portable Cursor entry, import the budget and current roles from `~/.cursor/rules/pstack-models.mdc`, leaving that file untouched.
 Report retired role lines that will be dropped.
 
@@ -58,6 +60,7 @@ Unavailable configured choices need an explicit supported replacement; do not si
 ## 4. Write and verify
 
 Use `t3` as the host key when configuring a T3 session, otherwise `cursor`, `codex`, or `claude`.
+Use that key in the destination filename, for example `~/.config/pstack/models-codex.json`.
 Choices are aliases or objects; panels are nonempty arrays.
 For example, this sets one inherited worker and two independent reviewers without promising different models:
 
@@ -78,8 +81,9 @@ For example, this sets one inherited worker and two independent reviewers withou
 
 A real choice has `model`, optional `providerInstanceId` for T3, and optional `options` with catalog-confirmed values.
 Validate every real choice against the selected transport, including option names and values.
-Create the parent directory if needed, write a temporary sibling, parse/read it back, and atomically rename it over the destination.
-Preserve unrelated host entries.
+Write only the selected host's entry to its own file.
+Create the parent directory if needed, write a unique temporary sibling, parse/read it back, and atomically rename it over that host's destination.
+Never replace the shared legacy file or another host's file.
 Read the final file back and compare it with the confirmed settings.
 Tell the user which host was configured and that the next skill invocation reads the settings.
 

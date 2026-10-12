@@ -23,13 +23,13 @@ Run:
 /setup-pstack
 ```
 
-[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) detects the models you have access to, asks for a reasoning budget, shows you each role (code delegates, judgment, the review panels), and asks what you want. Answer the questions. It writes `~/.config/pstack/models.json`, which pstack reads on each invocation with separate settings per host.
+[`/setup-pstack`](../../skills/setup-pstack/SKILL.md) detects the models you have access to, asks for a reasoning budget, shows you each role (code delegates, judgment, the review panels), and asks what you want. Answer the questions. It writes `~/.config/pstack/models-<host>.json`, which pstack reads on each invocation; separate files prevent concurrent hosts from replacing each other's settings.
 
 On native Cursor, the defaults run at `xhigh` reasoning, the same as the `large` budget. `unlimited` lifts each model to its highest tier, up to `max`. Opus goes to `max`. Grok tops out at `xhigh`, so it stays there. `medium` and `small` lower the reasoning and spend fewer tokens.
 
 You only override what you care about.
 An absent role keeps the supported host default; outside Cursor that is inheritance.
-To restore a default, remove that role from the selected host's `roles` object.
+To restore a default, remove that role from the selected host file's `roles` object.
 Setup preserves other hosts and customized choices on reruns.
 A legacy Cursor rule remains readable when no portable Cursor entry exists.
 

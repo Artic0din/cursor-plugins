@@ -38,7 +38,8 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
   - [ ] `git show origin/main:<control skill path>`
   - [ ] `git show origin/main:pstack/skills/poteto-mode/playbooks/opening-a-pr.md`
   - [ ] `git show origin/main:pstack/skills/<each other leaf skill the program uses>`
-- [ ] On the operator's go, arm the audit tick as `/loop 1h` with the tick prompt below. Never leave the cadence to memory.
+- [ ] On the operator's go, choose an available, authorized wake mechanism from the runtime reference and arm an hourly audit with the tick prompt below (`/loop 1h` only on a host that supports it).
+- [ ] If no persistent wake mechanism exists, audit after each verifiable unit during the active session, checkpoint before it ends, and report that unattended continuation is unavailable. Never promise a tick after the session ends.
 - [ ] Use this tick prompt, verbatim. "Re-read the execution playbook from trunk. Audit the operation against it and fix drift in this tick. Probe every active lane and judge progress by side effects only. Stand down a stuck lane and dispatch its replacement now. Then post a short status message to the operator in chat only when the audit found a tracked change that no earlier status message reported, such as a PR opened, a code-ready head, a round launched or closed, a verdict, a merge, a stuck agent and the action taken, a blocker added or cleared, or a decision only the operator can make. Name every such change and nothing else. Do not repeat a table, the merged list, or an unchanged blocker. If the audit found none, end the turn with no reply text. Either way, log this tick's row in your decision trail. The row names the items reported, or none."
 - [ ] On the operator's hold or stand-down, send every owner a zero-writes order at once.
 
@@ -68,7 +69,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 ### Boot recipe, for every live lane
 
-Each live lane runs on its own cloud VM at the PR head. Drive through `control-ui` or `control-cli` from `cursor-team-kit`.
+Each live lane runs at the PR head in its own supported isolated environment: a cloud VM when available, otherwise a separate local worktree with independent processes, ports, and data. Use an available control skill or the repo's actual driver through the runtime reference. If the required surface cannot run locally, report that lane blocked; never replace live proof with a static check.
 
 - [ ] `git fetch origin <head-branch> && git checkout <head SHA>`.
 - [ ] <Start the backend and the surface. Wait for ready.>
@@ -120,7 +121,7 @@ Each live lane runs on its own cloud VM at the PR head. Drive through `control-u
 **Review gate.** The operator reviews before merge.
 
 - [ ] Copy lane <n> screenshots into `<media path>/<pr-id>-review-<slug>.png`.
-- [ ] Record a 30 to 60 second video of the change on a lane VM. Save it as `<media path>/<pr-id>-review.mp4`.
+- [ ] Record a 30 to 60 second video of the change in the lane's supported isolated environment. Save it as `<media path>/<pr-id>-review.mp4`.
 - [ ] Post the screenshots and the video in chat. Stop at merge-ready. Wait for the operator's click.
 
 **Merge.**

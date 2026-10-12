@@ -7,6 +7,8 @@ disable-model-invocation: true
 # Poteto help
 
 Read [the runtime reference](../poteto-mode/references/runtime.md) before following this workflow's host-specific instructions.
+Resolve every skill invocation before presenting a command or recommendation: Cursor `/<skill>`, Codex `$<skill>`, Claude Code `/pstack:<skill>`; T3 uses its native provider's syntax.
+Unqualified slash commands in the tables below are source notation, not commands to copy into answers for other hosts.
 
 Answer the user's question about pstack, hand them a prompt they can send, and link the file the answer came from. For a help question, don't start the work. The user asked how, and a pstack run spends real tokens, so let them send the prompt.
 
@@ -31,14 +33,14 @@ Check the state that changes the answer, and mention it only when it does:
 
 When the model rule is missing and it matters, ask whether the user wants to pick a model for each role and a reasoning budget now. It matters when the user is new, the question is about setup or cost, or the answer depends on which models run. Ask at most once per chat. If the need is also unclear, ask both questions together. Offer two choices:
 
-- Now: give them `/setup-pstack` to type, and answer their question too.
-- Later: answer their question, and add one line saying every role keeps its default model until they run `/setup-pstack`.
+- Now: give them the host-resolved setup-pstack command to type, and answer their question too.
+- Later: answer their question, and explain that roles keep their supported host defaults until setup runs.
 
 ## Get set up
 
 1. Follow the active host's installation commands in the [README](../../README.md#install).
-2. Run [`/setup-pstack`](../setup-pstack/SKILL.md). It asks for a reasoning budget, maps supported models to roles, and writes portable settings read on the next invocation.
-3. Start a real task with `/poteto-mode`, a goal, and a check that can pass or fail.
+2. Run [setup-pstack](../setup-pstack/SKILL.md) using the active host's invocation syntax. It asks for a reasoning budget, maps supported models to roles, and writes portable settings read on the next invocation.
+3. Invoke poteto-mode with the active host's syntax, a goal, and a check that can pass or fail.
 
 Installing changes nothing until the user invokes a skill. Only `/setup-pstack` loads from the user's words. The [README](../../README.md) and [guide page 1](../../docs/guide/01-setup.md) have the details. Offer to word their first prompt with them, per [`references/prompting.md`](references/prompting.md).
 

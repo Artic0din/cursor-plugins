@@ -21,10 +21,12 @@ When multiple selection is unsupported or the tool is unavailable in this mode, 
 
 ## Role settings
 
-Read `~/.config/pstack/models.json` on each invocation.
+Resolve settings on each invocation: consider `t3` first when available, then the native host.
+For each candidate host, read `~/.config/pstack/models-<host>.json` first, otherwise that host's entry in legacy `~/.config/pstack/models.json`.
+Stop at the first configured host; setup writes only its host-specific file and leaves shared legacy settings untouched.
 Its shape is `{ "version": 1, "hosts": { "<host>": { "budget": "large", "roles": { "<role>": <choice> } } } }`, with host keys `cursor`, `codex`, `claude`, and `t3`.
 Validate version, host keys, budgets, the role list in setup-pstack, choice fields, and nonempty panels before using settings.
-Select `t3` settings when present in a T3 session, otherwise the native host's settings.
+Each host-specific file holds only its corresponding entry in `hosts`.
 A choice is `inherit-parent`, `auto`, or an object with `model`, optional `providerInstanceId` (T3 only), and optional `options` containing supported reasoning or speed settings.
 Panel roles hold a nonempty array of choices; each entry is one seat, even when entries repeat.
 The `arena cross-judge pool` is the exception: select one available entry for its single judge.
