@@ -69,7 +69,7 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 ### Boot recipe, for every live lane
 
-Each live lane runs at the PR head in its own supported isolated environment: a cloud VM when available, otherwise a separate local worktree with independent processes, ports, and data. Use an available control skill or the repo's actual driver through the runtime reference. If the required surface cannot run locally, report that lane blocked; never replace live proof with a static check.
+Each live lane runs at the PR head in its own supported isolated environment. Use a cloud VM when available, otherwise a separate local worktree with independent processes, ports, and data. Use an available control skill or the repo's actual driver through the runtime reference. If the required surface cannot run locally, report that lane blocked; never replace live proof with a static check.
 
 - [ ] `git fetch origin <head-branch> && git checkout <head SHA>`.
 - [ ] <Start the backend and the surface. Wait for ready.>

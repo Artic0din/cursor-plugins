@@ -12,6 +12,11 @@ Investigate the motivation and intent behind code. The companion `how` skill ans
 
 Resolve each named role through the runtime reference's role settings; the defaults listed below apply only on native Cursor.
 
+| Role | Native Cursor default |
+|---|---|
+| `why investigators` | `grok-4.7-xhigh-fast` |
+| `why synthesizer` | `claude-opus-5-5-xhigh` |
+
 Investigators and the synthesizer must retain the MCP tools their evidence needs.
 Use the runtime's general agent with a read-only task brief; on Cursor use agent mode rather than readonly/Ask mode because those modes strip MCP access.
 

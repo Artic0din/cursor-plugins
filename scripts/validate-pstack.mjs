@@ -63,6 +63,18 @@ for (const path of markdownFiles(resolve(pluginRoot, "skills"))) {
 }
 const fixture = mkdtempSync(resolve(tmpdir(), "pstack-history-"));
 try {
+  const plan = readFileSync(resolve(pluginRoot, "skills/poteto-mode/playbooks/multi-phase-plan.md"), "utf8")
+    .split("````markdown\n")[1].split("\n````")[0].replace(/<[^>\n]+>/g, "fixture");
+  const planPath = resolve(fixture, "plan.md");
+  writeFileSync(planPath, plan);
+  execFileSync(process.execPath, [resolve(pluginRoot, "skills/poteto-mode/scripts/check-plan.mjs"), planPath], {
+    encoding: "utf8", stdio: ["ignore", "pipe", "pipe"],
+  });
+  const why = readFileSync(resolve(pluginRoot, "skills/why/SKILL.md"), "utf8");
+  assert.match(why, /defaults listed below apply only on native Cursor/);
+  for (const [role, model] of [["why investigators", "grok-4.7-xhigh-fast"], ["why synthesizer", "claude-opus-5-5-xhigh"]]) {
+    assert(why.includes(`| \`${role}\` | \`${model}\` |`), `${role}: native Cursor default missing`);
+  }
   const bin = resolve(fixture, "bin");
   const main = resolve(fixture, "main");
   const worker = resolve(fixture, "worker");
@@ -145,4 +157,4 @@ exec "$PSTACK_TEST_REAL_STAT" "$@"
 } finally {
   rmSync(fixture, { recursive: true, force: true });
 }
-console.log(`pstack packaging, ${skills.length} skills, and history safety validated`);
+console.log(`pstack packaging, ${skills.length} skills, plan template, Cursor defaults, and history safety validated`);
